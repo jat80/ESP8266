@@ -36,14 +36,14 @@ light.pincode = "031-45-154";
 
 //add a light service and setup the On Characteristic
 light
-  .addService(Service.Lightbulb)
+  .addService(Service.Fan)
   .getCharacteristic(Characteristic.On)
   .on('get', function(callback) {
     callback(null, lightAction.getState());
   });
 
   light
-  .getService(Service.Lightbulb)
+  .getService(Service.Fan)
   .getCharacteristic(Characteristic.On)
   .on('set', function(value, callback) {
     lightAction.setState(value);
