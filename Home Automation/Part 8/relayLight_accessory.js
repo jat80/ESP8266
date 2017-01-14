@@ -80,6 +80,7 @@ var lightAction = {
 setInterval(function() {
   light
     .getService(Service.Lightbulb)
-    .setCharacteristic(Characteristic.On, lightAction.currentState);
+    .getCharacteristic(Characteristic.On) 
+    .updateValue(lightAction.currentState);
 
 }, 2000);
