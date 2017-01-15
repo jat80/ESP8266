@@ -12,7 +12,47 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 
-//OTA 
+
+
+//EDIT THESE LINES TO MATCH YOUR SETUP
+#define MQTT_SERVER "YOUR.MQTT.SERVER.IP"
+const char* ssid = "YOUR_SSID";
+const char* password = "YOUR_PASSWORD";
+
+//LED on ESP8266 GPIO2
+const int lightPin = 12;
+
+//topic to subscribe to for the light
+char* lightTopic = "/house/light1";
+
+//topic to publish to confirm that the light has been turned on for the python script to log
+char* lightConfirmTopic = "/house/light1confirm";
+
+
+WiFiClient wifiClient;
+PubSubClient client(MQTT_SERVER, 1883, callback, wifiClient);
+
+void setup() {
+	//initialize the light as an output and set to LOW (off)
+	pinMode(lightPin, OUTPUT);
+	digitalWrite(lightPin, LOW);
+
+	//start the serial line for debugging
+	Serial.begin(115200);
+	delay(100);
+
+
+	//start wifi subsystem
+	WiFi.begin(ssid, password);
+
+	//attempt to connect to the WIFI network and then connect to the MQTT server
+	reconnect();
+
+	//wait a bit before starting the main loop
+    	delay(2000);
+}
+
+//OTA
 
 void setup() {
   Serial.begin(115200);
@@ -57,52 +97,8 @@ void setup() {
   Serial.println(WiFi.localIP());
 }
 
-void loop() {
-  ArduinoOTA.handle();
-}
-
-//EDIT THESE LINES TO MATCH YOUR SETUP
-#define MQTT_SERVER "YOUR.MQTT.SERVER.IP"
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_PASSWORD";
-
-//LED on ESP8266 GPIO2
-const int lightPin = 2;
-
-//topic to subscribe to for the light
-char* lightTopic = "/house/light1";
-
-//topic to publish to confirm that the light has been turned on for the python script to log
-char* lightConfirmTopic = "/house/light1confirm";
-
-
-WiFiClient wifiClient;
-PubSubClient client(MQTT_SERVER, 1883, callback, wifiClient);
-
-void setup() {
-	//initialize the light as an output and set to LOW (off)
-	pinMode(lightPin, OUTPUT);
-	digitalWrite(lightPin, LOW);
-
-	//start the serial line for debugging
-	Serial.begin(115200);
-	delay(100);
-
-
-	//start wifi subsystem
-	WiFi.begin(ssid, password);
-
-	//attempt to connect to the WIFI network and then connect to the MQTT server
-	reconnect();
-
-	//wait a bit before starting the main loop
-    	delay(2000);
-}
-
-
-
 void loop(){
-
+        ArduinoOTA.handle();
 	//reconnect if connection is lost
 	if (!client.connected() && WiFi.status() == 3) {reconnect();}
 
